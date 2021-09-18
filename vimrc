@@ -150,7 +150,7 @@ if empty(glob(g:vimplug_dir))
 		silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
 					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	endif
-	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+	autocmd VimEnter * PlugInstall --sync
 endif
 
 " Start of adding Vim plugins
