@@ -29,27 +29,10 @@ endif
 
 " ----- VANILLA CONFIG ----- "
 
-" Show relative line numbers on sidebar
-set nu
-set relativenumber
-
-" No longer need to press shift to press : in normal and visual mode
-nnoremap ; :
-vnoremap ; :
-
-" Always shows at least 2 lines around the cursor
-set scrolloff=2
-
-" Makes `set list` visually more clear to show invisible chars
-set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:‗
-
-" Vim clipboard and System clipboard are shared
-" (Requires vim to be compiled to support this to work)
-" (On Arch this means you need GVim installed)
-set clipboard=unnamedplus
+" -- CUSTOM SHORTCUTS -- "
 
 " For switching buffers fast:
-nnoremap <C-j> :bn<CR>
+nnoremap <C-l> :bn<CR>
 nnoremap <C-h> :bp<CR>
 " I may remove the following one once I figure out buffers better
 nnoremap gb :ls<CR>:b
@@ -57,9 +40,25 @@ nnoremap gb :ls<CR>:b
 " type `gb` to show buffer
 " press number to select and enter to switch
 
-" Enable folding of code according to the syntax of the language
-set foldmethod=syntax
+" Moving a line to a different spot
+"execute "set <A-j>=\ej"
+"execute "set <A-k>=\ek"
+nnoremap <C-k> :m .-2<CR>==
+nnoremap <C-j> :m .+1<CR>==
+inoremap <C-j> <Esc>:m .+1<CR>==gi
+inoremap <C-k> <Esc>:m .-2<CR>==gi
+vnoremap <C-j> :m '>+1<CR>gv=gv
+vnoremap <C-k> :m '<-2<CR>gv=gv
 
+" No longer need to press shift to press : in normal and visual mode
+nnoremap ; :
+vnoremap ; :
+
+" `o` and `O` now only adds new line without going into insert mode
+nnoremap o o<esc>
+nnoremap O O<esc>
+
+" -- CUSTOM COMMANDS -- "
 " Toggle spell check
 let g:spellcheck_is_enabled = 0
 function! ToggleSpellCheck()
@@ -103,6 +102,42 @@ endfunction
 command ToggleAutoIndent call ToggleAutoIndent()
 call ToggleAutoIndent()
 
+" -- OTHER -- "
+
+" Show relative line numbers on sidebar
+set nu
+set relativenumber
+
+" Always shows at least 2 lines around the cursor
+set scrolloff=2
+
+" Makes `set list` visually more clear to show invisible chars
+set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:‗
+
+" Vim clipboard and System clipboard are shared
+" (Requires vim to be compiled to support this to work)
+" (On Arch this means you need GVim installed)
+set clipboard=unnamedplus
+
+" Wrap to different line when reaching end or beginning of a line
+set whichwrap=b,s,<,>,[,]
+
+" Keep indent when line wraps
+set breakindent
+
+" Don't split words when wrapping
+set linebreak
+
+" Faster Drawing
+set ttyfast
+
+" Enable folding of code according to the syntax of the language
+set foldmethod=syntax
+
+" Prefer to split below
+set splitbelow
+
+
 " ----- PLUGIN INITIALIZATION ----- "
 
 " Install VimPlug if it isn't installed
@@ -120,12 +155,15 @@ if "source ~/.config/vim/vimrc" == $VIMINIT
 else
 	call plug#begin('~/.vim/plugged')
 endif
-" Code Completion
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Airline UI for top and bottom bars
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 " Execute Projects and Terminal commands asynchronously
 Plug 'skywind3000/asyncrun.vim'
 " Searches for custom .vimrc files for specific projects
 Plug 'krisajenkins/vim-projectlocal'
+" Code Completion
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Markdown Preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 
 			\'for': ['markdown', 'vim-plug']}
@@ -135,9 +173,6 @@ Plug 'lervag/vimtex'
 Plug 'vimwiki/vimwiki'
 " Autogenerate Markdown Table of Contents
 Plug 'mzlogin/vim-markdown-toc'
-" Airline UI for top and bottom bars
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 " End of adding Vim plugins
 
@@ -180,4 +215,3 @@ command WordCount call WC()
 " Make vimwiki use Markdown
 let g:vimwiki_list = [{'path': '~/vimwiki/',
 			\ 'syntax': 'markdown', 'ext': '.md'}]
-
