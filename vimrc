@@ -143,11 +143,15 @@ set splitbelow
 " Install VimPlug if it isn't installed
 " It will also install all the plugins in this case
 if empty(glob(g:vimplug_dir))
-	silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
-				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	if "source ~/.config/vim/vimrc" == $VIMINIT
+		silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
+					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	else
+		silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	endif
 	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-
 
 " Start of adding Vim plugins
 if "source ~/.config/vim/vimrc" == $VIMINIT
