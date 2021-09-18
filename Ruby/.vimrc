@@ -4,5 +4,5 @@ map <f5> :AsyncRun -cwd=<root> ruby run.rb<CR>
 " Identify .mab files as Ruby
 augroup syntax_mab_files
 	autocmd!
-	autocmd VimEnter,BufNewFile,BufRead *.mab set syntax=ruby
+	autocmd VimEnter,BufNewFile,BufEnter *.mab set syntax=ruby
 augroup end
