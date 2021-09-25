@@ -31,24 +31,22 @@ endif
 
 " -- CUSTOM SHORTCUTS -- "
 
+" Space is used as the 'modifier'/'leader' key
+let mapleader = " "
+
+" For searching buffers:
+nnoremap <leader>e :e **/
 " For switching buffers fast:
-nnoremap <C-l> :bn<CR>
-nnoremap <C-h> :bp<CR>
-" I may remove the following one once I figure out buffers better
-nnoremap gb :ls<CR>:b
-" you can use ctrl+h/j to cycle
-" type `gb` to show buffer
-" press number to select and enter to switch
+nnoremap <leader>l :bn<CR>
+nnoremap <leader>h :bp<CR>
 
 " Moving a line to a different spot
-"execute "set <A-j>=\ej"
-"execute "set <A-k>=\ek"
-nnoremap <C-k> :m .-2<CR>==
-nnoremap <C-j> :m .+1<CR>==
-inoremap <C-j> <Esc>:m .+1<CR>==gi
-inoremap <C-k> <Esc>:m .-2<CR>==gi
-vnoremap <C-j> :m '>+1<CR>gv=gv
-vnoremap <C-k> :m '<-2<CR>gv=gv
+nnoremap <leader>k :m .-2<CR>==
+nnoremap <leader>j :m .+1<CR>==
+inoremap <leader>j <Esc>:m .+1<CR>==gi
+inoremap <leader>k <Esc>:m .-2<CR>==gi
+vnoremap <leader>j :m '>+1<CR>gv=gv
+vnoremap <leader>k :m '<-2<CR>gv=gv
 
 " No longer need to press shift to press : in normal and visual mode
 nnoremap ; :
