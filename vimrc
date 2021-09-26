@@ -83,11 +83,12 @@ augroup enable_spellcheck_when_relevant
 augroup END
 
 " Toggle Autoindenting Code on filesave
+nnoremap g= :let b:PlugView=winsaveview()<CR>gg=G:call winrestview(b:PlugView) <CR>
 function! ToggleAutoIndent()
 	if !exists('#autoindent_on_save#BufEnter')
 		augroup autoindent_on_save
 			autocmd!
-			autocmd BufWritePre * :normal gg=G''
+			autocmd BufWritePre * :normal g=
 			set statusline=AutoIndent\ Enabled
 		augroup END
 	else
