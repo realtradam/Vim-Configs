@@ -122,6 +122,7 @@ set whichwrap=b,s,<,>,[,]
 
 " Keep indent when line wraps
 set breakindent
+set showbreak=\ ·
 
 " Don't split words when wrapping
 set linebreak
