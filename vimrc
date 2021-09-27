@@ -34,19 +34,25 @@ endif
 " Space is used as the 'modifier'/'leader' key
 let mapleader = " "
 
-" For searching buffers:
+" For switching/opening buffers:
 nnoremap <leader>e :e **/
-" For switching buffers fast:
-nnoremap <leader>l :bn<CR>
-nnoremap <leader>h :bp<CR>
+
+" For switching buffers next/previous:
+nnoremap <C-l> :bn<CR>
+nnoremap <C-h> :bp<CR>
+
+" For cycling windows or jump to window:
+nnoremap <cr> <c-w>w
+nnoremap <number><cr> <number><c-w>w
 
 " Moving a line to a different spot
-nnoremap <leader>k :m .-2<CR>==
-nnoremap <leader>j :m .+1<CR>==
-inoremap <leader>j <Esc>:m .+1<CR>==gi
-inoremap <leader>k <Esc>:m .-2<CR>==gi
-vnoremap <leader>j :m '>+1<CR>gv=gv
-vnoremap <leader>k :m '<-2<CR>gv=gv
+" 	Dont really use this and not sure what to map it to
+" nnoremap <leader>k :m .-2<CR>==
+" nnoremap <leader>j :m .+1<CR>==
+" inoremap <leader>j <Esc>:m .+1<CR>==gi
+" inoremap <leader>k <Esc>:m .-2<CR>==gi
+" vnoremap <leader>j :m '>+1<CR>gv=gv
+" vnoremap <leader>k :m '<-2<CR>gv=gv
 
 " No longer need to press shift to press : in normal and visual mode
 nnoremap ; :
@@ -177,6 +183,8 @@ Plug 'lervag/vimtex'
 Plug 'vimwiki/vimwiki'
 " Autogenerate Markdown Table of Contents
 Plug 'mzlogin/vim-markdown-toc'
+" Sophisticated Multi-Line Editing
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 call plug#end()
 " End of adding Vim plugins
 
