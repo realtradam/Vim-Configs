@@ -37,15 +37,16 @@ endif
 let mapleader = " "
 
 " For switching/opening buffers:
-nnoremap <leader>e :e **/
+nnoremap <leader>e :e **/*
 
 " For switching buffers next/previous:
 nnoremap <C-l> :bn<CR>
 nnoremap <C-h> :bp<CR>
 
 " For cycling windows or jump to window:
-nnoremap <cr> <c-w>w
-nnoremap <number><cr> <number><c-w>w
+" 	removed because conflicted with vimwiki bindings
+" nnoremap <s-cr> <c-w>w
+" nnoremap <number><S-CR> <number><c-w>w
 
 " Moving a line to a different spot
 " 	Dont really use this and not sure what to map it to
@@ -61,6 +62,7 @@ nnoremap ; :
 vnoremap ; :
 
 " `o` and `O` now only adds new line without going into insert mode
+" 	TODO: broken in vimwiki
 nnoremap o o<esc>
 nnoremap O O<esc>
 
@@ -93,7 +95,7 @@ augroup END
 " Toggle Autoindenting Code on filesave
 nnoremap g= :let b:PlugView=winsaveview()<CR>gg=G:call winrestview(b:PlugView) <CR>
 function! ToggleAutoIndent()
-	if !exists('#autoindent_on_save#BufEnter')
+	if !exists('#autoindent_on_save#BufWritePre')
 		augroup autoindent_on_save
 			autocmd!
 			autocmd BufWritePre * :normal g=
@@ -108,6 +110,19 @@ function! ToggleAutoIndent()
 endfunction
 command ToggleAutoIndent call ToggleAutoIndent()
 call ToggleAutoIndent()
+" Remove autoindentation if you open a regular text file
+" TODO: doesn't work for some reason
+function! DisableAutoIndent()
+	augroup autoindent_on_save
+		autocmd!
+		set statusline=AutoIndent\ Disabled
+	augroup END
+endfunction
+augroup remove_indent_text_files
+	autocmd!
+	autocmd VimEnter,BufNewFile,BufRead *.md,*.mdown, " *.tex,
+				\*.txt,*.wiki call DisableAutoIndent()
+augroup END
 
 " -- OTHER -- "
 
@@ -141,6 +156,7 @@ set ttyfast
 
 " Enable folding of code according to the syntax of the language
 set foldmethod=syntax
+"	alternative: :set foldmethod=indent
 " Remember folds when switching buffers
 augroup remember_folds
 	autocmd!
@@ -224,12 +240,13 @@ hi Pmenu ctermbg=black ctermfg=white
 
 " Vimwiki configs
 " change symbols used for checkboxes
-let g:vimwiki_listsyms = '✗○●✓'
+let g:vimwiki_listsyms = ' ~✓' "✗○●
 " Makes code completion suggestions work with vimwiki files
 augroup ft_vimwiki
-    au!
-    au BufRead,BufNewFile *.wiki set filetype=vimwiki
-    au FileType vimwiki inoremap <silent> <buffer> <expr> <CR>   pumvisible() ? "\<CR>"   : "<Esc>:VimwikiReturn 1 5<CR>"
+	au!
+	au BufRead,BufNewFile *.wiki set filetype=vimwiki
+	au FileType vimwiki inoremap <silent> <buffer> <expr> <CR>   pumvisible() ? "\<CR>"   : "<Esc>:VimwikiReturn 1 5<CR>"
+	au FileType vimwiki inoremap <silent> <buffer> <expr> <S-CR> pumvisible() ? "\<S-CR>" : "<Esc>:VimwikiReturn 2 2<CR>"
 augroup END
 
 " what program should vimtex use to show live edits
