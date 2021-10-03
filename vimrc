@@ -22,6 +22,8 @@ if "source ~/.config/vim/vimrc" == $VIMINIT
 	let &runtimepath.=','.rtp.',~/.config/vim/after'
 	" Move .viminfo files to .config/vim as well
 	set viminfo+=n~/.config/vim/viminfo
+	" Write view files to .config/vim
+	set viewdir=~/.config/vim/view
 else
 	" Where to check for vimplug later on
 	let g:vimplug_dir = "~/.vim/autoload/plug.vim"
@@ -129,7 +131,7 @@ set whichwrap=b,s,<,>,[,]
 
 " Keep indent when line wraps
 set breakindent
-set showbreak=\ ·
+set showbreak=\ \ ·
 
 " Don't split words when wrapping
 set linebreak
@@ -139,6 +141,12 @@ set ttyfast
 
 " Enable folding of code according to the syntax of the language
 set foldmethod=syntax
+" Remember folds when switching buffers
+augroup remember_folds
+	autocmd!
+	autocmd BufWinLeave ?* mkview | filetype detect
+	autocmd BufWinEnter ?* silent loadview | filetype detect
+augroup END
 
 " Prefer to split below
 set splitbelow
@@ -185,6 +193,10 @@ Plug 'vimwiki/vimwiki'
 Plug 'mzlogin/vim-markdown-toc'
 " Sophisticated Multi-Line Editing
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+
+" Live Preview of HTML/CSS/JS
+" 	outdated parser, but plugin in development
+Plug 'turbio/bracey.vim'
 call plug#end()
 " End of adding Vim plugins
 
@@ -209,6 +221,16 @@ command DarkTheme AirlineTheme distinguished
 
 " Makes popup text readable
 hi Pmenu ctermbg=black ctermfg=white
+
+" Vimwiki configs
+" change symbols used for checkboxes
+let g:vimwiki_listsyms = '✗○●✓'
+" Makes code completion suggestions work with vimwiki files
+augroup ft_vimwiki
+    au!
+    au BufRead,BufNewFile *.wiki set filetype=vimwiki
+    au FileType vimwiki inoremap <silent> <buffer> <expr> <CR>   pumvisible() ? "\<CR>"   : "<Esc>:VimwikiReturn 1 5<CR>"
+augroup END
 
 " what program should vimtex use to show live edits
 let g:vimtex_view_method = 'zathura'
