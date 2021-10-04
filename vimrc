@@ -164,6 +164,20 @@ augroup remember_folds
 	autocmd BufWinEnter ?* silent loadview | filetype detect
 augroup END
 
+function! MakeSession() 
+	let cwd = getcwd()
+	let filename = cwd . '/.vim'
+	exe "mksession! " . filename
+	exe "tabedit! " . filename
+	exe "silent g:^cd :d"
+	exe "silent g:^lcd :d"
+	" exe "silent %s:\V" . cwd . "/::ge"
+	" ^ Don’t work because getcwd() expand the ~ while mksession does not !
+	exe "silent %s?\\v \\~=/.+/? ?g"
+	" ^ backslash need to be protected
+	exe "x"
+endfunction
+
 " Prefer to split below
 set splitbelow
 
@@ -245,8 +259,8 @@ let g:vimwiki_listsyms = ' ~✓' "✗○●
 augroup ft_vimwiki
 	au!
 	au BufRead,BufNewFile *.wiki set filetype=vimwiki
-	au FileType vimwiki inoremap <silent> <buffer> <expr> <CR>   pumvisible() ? "\<CR>"   : "<Esc>:VimwikiReturn 1 5<CR>"
-	au FileType vimwiki inoremap <silent> <buffer> <expr> <S-CR> pumvisible() ? "\<S-CR>" : "<Esc>:VimwikiReturn 2 2<CR>"
+	au FileType vimwiki inoremap <silent> <buffer> <expr> <CR> complete_info()['selected'] > -1 ? "\<CR>" : "<Esc>:VimwikiReturn 1 5<CR>"
+	au FileType vimwiki inoremap <silent> <buffer> <expr> <S-CR> complete_info()['selected'] > -1 ? "\<S-CR>" : "<Esc>:VimwikiReturn 2 2<CR>"
 augroup END
 
 " what program should vimtex use to show live edits
