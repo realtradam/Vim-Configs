@@ -2,6 +2,10 @@
 unlet! skip_defaults_vim
 source $VIMRUNTIME/defaults.vim
 
+" Set utf-8 encoding early to prevent issues later on
+set encoding=utf-8
+set fileencoding=utf-8
+
 " ----- CUSTOM CONFIGURATION DIRECTORY ----- "
 "  If you don't care about changing the vim config directory then you can
 "  safely ignore this section
@@ -261,6 +265,13 @@ augroup ft_vimwiki
 	au BufRead,BufNewFile *.wiki set filetype=vimwiki
 	au FileType vimwiki inoremap <silent> <buffer> <expr> <CR> complete_info()['selected'] > -1 ? "\<CR>" : "<Esc>:VimwikiReturn 1 5<CR>"
 	au FileType vimwiki inoremap <silent> <buffer> <expr> <S-CR> complete_info()['selected'] > -1 ? "\<S-CR>" : "<Esc>:VimwikiReturn 2 2<CR>"
+augroup END
+
+" Coc configs
+" Fix autocompletion adding a newline while in visual multi mode
+augroup coc_autocomplete_newline
+	au!
+	autocmd User visual_multi_mappings  imap <buffer><expr> <CR> pumvisible() ? "\<C-Y>" : "\<Plug>(VM-I-Return)"
 augroup END
 
 " what program should vimtex use to show live edits
