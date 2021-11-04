@@ -1,6 +1,6 @@
 " When creating a custom .vimrc we need to re-enable the defaults
-unlet! skip_defaults_vim
-source $VIMRUNTIME/defaults.vim
+" unlet! skip_defaults_vim
+" source $VIMRUNTIME/defaults.vim
 
 " Set utf-8 encoding early to prevent issues later on
 set encoding=utf-8
@@ -15,22 +15,28 @@ set fileencoding=utf-8
 " 	export VIMINIT="source ~/.config/vim/vimrc"
 " and place this vimrc into `~/.config/vim/vimrc`.
 " Otherwise Vim will configure itself automatically using default directories
-if "source ~/.config/vim/vimrc" == $VIMINIT
-	" Where to check for vimplug later on
-	let g:vimplug_dir = "~/.config/vim/autoload/plug.vim"
-	" Used for moving .vim into .config/vim
-	set viminfo+=n~/.config/vim/viminfo
-	" Create new runtime paths to .config/vim and enforce order
-	let rtp=&runtimepath
-	set runtimepath=~/.config/vim
-	let &runtimepath.=','.rtp.',~/.config/vim/after'
-	" Move .viminfo files to .config/vim as well
-	set viminfo+=n~/.config/vim/viminfo
-	" Write view files to .config/vim
-	set viewdir=~/.config/vim/view
+" NOTE: NVim will also listen to this environment variable so remove it if you
+" switch to nvim
+if !has('nvim')
+	if "source ~/.config/vim/vimrc" == $VIMINIT
+		" Where to check for vimplug later on
+		let g:vimplug_dir = "~/.config/vim/autoload/plug.vim"
+		" Used for moving .vim into .config/vim
+		set viminfo+=n~/.config/vim/viminfo
+		" Create new runtime paths to .config/vim and enforce order
+		let rtp=&runtimepath
+		set runtimepath=~/.config/vim
+		let &runtimepath.=','.rtp.',~/.config/vim/after'
+		" Move .viminfo files to .config/vim as well
+		set viminfo+=n~/.config/vim/viminfo
+		" Write view files to .config/vim
+		set viewdir=~/.config/vim/view
+	else
+		" Where to check for vimplug later on
+		let g:vimplug_dir = "~/.vim/autoload/plug.vim"
+	endif
 else
-	" Where to check for vimplug later on
-	let g:vimplug_dir = "~/.vim/autoload/plug.vim"
+	let g:vimplug_dir = "~/.config/nvim/autoload/plug.vim"
 endif
 
 " ----- VANILLA CONFIG ----- "
@@ -130,6 +136,11 @@ augroup END
 
 " -- OTHER -- "
 
+" Small tabs for a small monitor
+set tabstop=2
+set shiftwidth=1
+set softtabstop=2
+
 " Show relative line numbers on sidebar
 set nu
 set relativenumber
@@ -161,51 +172,59 @@ set ttyfast
 " Enable folding of code according to the syntax of the language
 set foldmethod=syntax
 "	alternative: :set foldmethod=indent
+
 " Remember folds when switching buffers
 augroup remember_folds
 	autocmd!
-	autocmd BufWinLeave ?* mkview | filetype detect
-	autocmd BufWinEnter ?* silent loadview | filetype detect
+	autocmd BufLeave,BufWinLeave ?* mkview | filetype detect
+	autocmd BufReadPost ?* silent! loadview | filetype detect
 augroup END
 
-function! MakeSession() 
-	let cwd = getcwd()
-	let filename = cwd . '/.vim'
-	exe "mksession! " . filename
-	exe "tabedit! " . filename
-	exe "silent g:^cd :d"
-	exe "silent g:^lcd :d"
-	" exe "silent %s:\V" . cwd . "/::ge"
-	" ^ Don’t work because getcwd() expand the ~ while mksession does not !
-	exe "silent %s?\\v \\~=/.+/? ?g"
-	" ^ backslash need to be protected
-	exe "x"
-endfunction
 
 " Prefer to split below
 set splitbelow
 
+" Enables undercurl and easier to read terminal
+set termguicolors
+
+" NVim Specific Configuration
+if has('nvim')
+	" Allows using mouse to resize window borders
+	set mouse+=a
+endif
 
 " ----- PLUGIN INITIALIZATION ----- "
 
 " Install VimPlug if it isn't installed
 " It will also install all the plugins in this case
-if empty(glob(g:vimplug_dir))
-	if "source ~/.config/vim/vimrc" == $VIMINIT
-		silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
-					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-	else
-		silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if !has('nvim')
+	if empty(glob(g:vimplug_dir))
+		if "source ~/.config/vim/vimrc" == $VIMINIT
+			silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
+						\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+		else
+			silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+						\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+		endif
+		autocmd VimEnter * PlugInstall --sync
 	endif
-	autocmd VimEnter * PlugInstall --sync
+else
+	if empty(glob(g:vimplug_dir))
+		silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+		autocmd VimEnter * PlugInstall --sync
+	endif
 endif
 
 " Start of adding Vim plugins
-if "source ~/.config/vim/vimrc" == $VIMINIT
-	call plug#begin('~/.config/vim/plugged')
+if !has('nvim')
+	if "source ~/.config/vim/vimrc" == $VIMINIT
+		call plug#begin('~/.config/vim/plugged')
+	else
+		call plug#begin('~/.vim/plugged')
+	endif
 else
-	call plug#begin('~/.vim/plugged')
+	call plug#begin('~/.config/nvim/plugged')
 endif
 " Airline UI for top and bottom bars
 Plug 'vim-airline/vim-airline'
@@ -227,6 +246,12 @@ Plug 'vimwiki/vimwiki'
 Plug 'mzlogin/vim-markdown-toc'
 " Sophisticated Multi-Line Editing
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+
+" File Templates
+Plug 'tibabit/vim-templates'
+
+" Fixed .vue indentation
+Plug 'leafOfTree/vim-vue-plugin'
 
 " Live Preview of HTML/CSS/JS
 " 	outdated parser, but plugin in development
@@ -253,8 +278,11 @@ let g:airline#extensions#tabline#enabled=1
 command LightTheme AirlineTheme silver
 command DarkTheme AirlineTheme distinguished
 
-" Makes popup text readable
-hi Pmenu ctermbg=black ctermfg=white
+" Theme Changes
+" hi Pmenu ctermbg=black ctermfg=white
+hi PmenuSel guibg=yellow guifg=black
+hi Pmenu ctermbg=gray guibg=purple
+hi Folded guibg=#422552 guifg=#00dddd
 
 " Vimwiki configs
 " change symbols used for checkboxes
