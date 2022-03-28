@@ -1,6 +1,6 @@
 " When creating a custom .vimrc we need to re-enable the defaults
-" unlet! skip_defaults_vim
-" source $VIMRUNTIME/defaults.vim
+"unlet! skip_defaults_vim
+"source $VIMRUNTIME/defaults.vim
 
 " Set utf-8 encoding early to prevent issues later on
 set encoding=utf-8
@@ -119,27 +119,31 @@ function! ToggleAutoIndent()
 	endif
 endfunction
 command ToggleAutoIndent call ToggleAutoIndent()
-call ToggleAutoIndent()
+"call ToggleAutoIndent()
 " Remove autoindentation if you open a regular text file
 " TODO: doesn't work for some reason
-function! DisableAutoIndent()
-	augroup autoindent_on_save
-		autocmd!
-		set statusline=AutoIndent\ Disabled
-	augroup END
-endfunction
-augroup remove_indent_text_files
-	autocmd!
-	autocmd VimEnter,BufNewFile,BufRead *.md,*.mdown, " *.tex,
-				\*.txt,*.wiki call DisableAutoIndent()
-augroup END
+"function! DisableAutoIndent()
+"	augroup autoindent_on_save
+"		autocmd!
+"		set statusline=AutoIndent\ Disabled
+"	augroup END
+"endfunction
+"augroup remove_indent_text_files
+"	autocmd!
+"	autocmd VimEnter,BufNewFile,BufRead *.md,*.mdown, " *.tex,
+"				\*.txt,*.wiki call DisableAutoIndent()
+"augroup END
 
 " -- OTHER -- "
 
-" Small tabs for a small monitor
-set tabstop=2
-set shiftwidth=1
-set softtabstop=2
+" Setting tab size
+"set tabstop=3
+"set shiftwidth=3
+"set softtabstop=3
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+"set expandtab
 
 " Show relative line numbers on sidebar
 set nu
@@ -176,8 +180,10 @@ set foldmethod=syntax
 " Remember folds when switching buffers
 augroup remember_folds
 	autocmd!
-	autocmd BufLeave,BufWinLeave ?* mkview | filetype detect
-	autocmd BufReadPost ?* silent! loadview | filetype detect
+	"autocmd BufLeave,BufWinLeave ?* mkview | filetype detect
+	"autocmd BufReadPost ?* silent! loadview | filetype detect
+	autocmd BufWinLeave ?* mkview
+	autocmd BufWinEnter ?* silent! loadview
 augroup END
 
 
@@ -185,7 +191,7 @@ augroup END
 set splitbelow
 
 " Enables undercurl and easier to read terminal
-set termguicolors
+" set termguicolors
 
 " NVim Specific Configuration
 if has('nvim')
@@ -230,18 +236,18 @@ endif
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 " Execute Projects and Terminal commands asynchronously
-Plug 'skywind3000/asyncrun.vim'
+"Plug 'skywind3000/asyncrun.vim'
 " Searches for custom .vimrc files for specific projects
-Plug 'krisajenkins/vim-projectlocal'
+"Plug 'krisajenkins/vim-projectlocal'
 " Code Completion
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " Markdown Preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 
 			\'for': ['markdown', 'vim-plug']}
 " Latex Compiling and Preview
 Plug 'lervag/vimtex'
 " Vimwiki for writing down notes
-Plug 'vimwiki/vimwiki'
+"Plug 'vimwiki/vimwiki'
 " Autogenerate Markdown Table of Contents
 Plug 'mzlogin/vim-markdown-toc'
 " Sophisticated Multi-Line Editing
@@ -251,11 +257,13 @@ Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'tibabit/vim-templates'
 
 " Fixed .vue indentation
-Plug 'leafOfTree/vim-vue-plugin'
+"Plug 'leafOfTree/vim-vue-plugin'
+" Fixed .svelte indentation
+"Plug 'leafOfTree/vim-svelte-plugin'
 
 " Live Preview of HTML/CSS/JS
 " 	outdated parser, but plugin in development
-Plug 'turbio/bracey.vim'
+"Plug 'turbio/bracey.vim'
 call plug#end()
 " End of adding Vim plugins
 
@@ -279,10 +287,11 @@ command LightTheme AirlineTheme silver
 command DarkTheme AirlineTheme distinguished
 
 " Theme Changes
+" Disabled for now
 " hi Pmenu ctermbg=black ctermfg=white
-hi PmenuSel guibg=yellow guifg=black
-hi Pmenu ctermbg=gray guibg=purple
-hi Folded guibg=#422552 guifg=#00dddd
+" hi PmenuSel guibg=yellow guifg=black
+" hi Pmenu ctermbg=gray guibg=purple
+" hi Folded guibg=#422552 guifg=#00dddd
 
 " Vimwiki configs
 " change symbols used for checkboxes
@@ -303,7 +312,8 @@ augroup coc_autocomplete_newline
 augroup END
 
 " what program should vimtex use to show live edits
-let g:vimtex_view_method = 'zathura'
+" let g:vimtex_view_method = 'zathura'
+let g:vimtex_view_general_viewer = 'atril'
 " what flavour vimtex should use for autocomplete
 let g:tex_flavor = 'latex'
 " function for counting words in a latex file
