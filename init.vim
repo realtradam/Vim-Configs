@@ -6,17 +6,7 @@
 set encoding=utf-8
 set fileencoding=utf-8
 
-" ----- CUSTOM CONFIGURATION DIRECTORY ----- "
-"  If you don't care about changing the vim config directory then you can
-"  safely ignore this section
-
-" If you wish to use .config/vim directory instead make sure to add the
-" following to your .bashrc:
-" 	export VIMINIT="source ~/.config/vim/vimrc"
-" and place this vimrc into `~/.config/vim/vimrc`.
-" Otherwise Vim will configure itself automatically using default directories
-" NOTE: NVim will also listen to this environment variable so remove it if you
-" switch to nvim
+" ----- SET DIRECTORY ----- "
 if !has('nvim')
 	" Where to check for vimplug later on
 	let g:vimplug_dir = "~/.vim/autoload/plug.vim"
