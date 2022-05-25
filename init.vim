@@ -18,23 +18,8 @@ set fileencoding=utf-8
 " NOTE: NVim will also listen to this environment variable so remove it if you
 " switch to nvim
 if !has('nvim')
-	if "source ~/.config/vim/vimrc" == $VIMINIT
-		" Where to check for vimplug later on
-		let g:vimplug_dir = "~/.config/vim/autoload/plug.vim"
-		" Used for moving .vim into .config/vim
-		set viminfo+=n~/.config/vim/viminfo
-		" Create new runtime paths to .config/vim and enforce order
-		let rtp=&runtimepath
-		set runtimepath=~/.config/vim
-		let &runtimepath.=','.rtp.',~/.config/vim/after'
-		" Move .viminfo files to .config/vim as well
-		set viminfo+=n~/.config/vim/viminfo
-		" Write view files to .config/vim
-		set viewdir=~/.config/vim/view
-	else
-		" Where to check for vimplug later on
-		let g:vimplug_dir = "~/.vim/autoload/plug.vim"
-	endif
+	" Where to check for vimplug later on
+	let g:vimplug_dir = "~/.vim/autoload/plug.vim"
 else
 	let g:vimplug_dir = "~/.config/nvim/autoload/plug.vim"
 endif
@@ -45,6 +30,13 @@ endif
 
 " Space is used as the 'modifier'/'leader' key
 let mapleader = " "
+
+" Create new file if it doesnt exist
+nnoremap cgf :e <cfile><CR>
+" Go to path if it exists
+nnoremap <return> gf
+" Return from last buffer
+nnoremap <BS> :b#<CR>
 
 " For switching/opening buffers:
 nnoremap <leader>e :e **/*
@@ -79,6 +71,7 @@ nnoremap O O<esc>
 " -- CUSTOM COMMANDS -- "
 " Toggle spell check
 let g:spellcheck_is_enabled = 0
+set nospell
 function! ToggleSpellCheck()
 	if g:spellcheck_is_enabled
 		let g:spellcheck_is_enabled = 0
@@ -104,42 +97,10 @@ augroup END
 
 " Toggle Autoindenting Code on filesave
 nnoremap g= :let b:PlugView=winsaveview()<CR>gg=G:call winrestview(b:PlugView) <CR>
-function! ToggleAutoIndent()
-	if !exists('#autoindent_on_save#BufWritePre')
-		augroup autoindent_on_save
-			autocmd!
-			autocmd BufWritePre * :normal g=
-			set statusline=AutoIndent\ Enabled
-		augroup END
-	else
-		augroup autoindent_on_save
-			autocmd!
-			set statusline=AutoIndent\ Disabled
-		augroup END
-	endif
-endfunction
-command ToggleAutoIndent call ToggleAutoIndent()
-"call ToggleAutoIndent()
-" Remove autoindentation if you open a regular text file
-" TODO: doesn't work for some reason
-"function! DisableAutoIndent()
-"	augroup autoindent_on_save
-"		autocmd!
-"		set statusline=AutoIndent\ Disabled
-"	augroup END
-"endfunction
-"augroup remove_indent_text_files
-"	autocmd!
-"	autocmd VimEnter,BufNewFile,BufRead *.md,*.mdown, " *.tex,
-"				\*.txt,*.wiki call DisableAutoIndent()
-"augroup END
 
 " -- OTHER -- "
 
 " Setting tab size
-"set tabstop=3
-"set shiftwidth=3
-"set softtabstop=3
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
@@ -159,9 +120,6 @@ set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:‗
 " (Requires vim to be compiled to support this to work)
 " (On Arch this means you need GVim installed)
 set clipboard=unnamedplus
-
-" Wrap to different line when reaching end or beginning of a line
-set whichwrap=b,s,<,>,[,]
 
 " Keep indent when line wraps
 set breakindent
@@ -190,9 +148,6 @@ augroup END
 " Prefer to split below
 set splitbelow
 
-" Enables undercurl and easier to read terminal
-" set termguicolors
-
 " NVim Specific Configuration
 if has('nvim')
 	" Allows using mouse to resize window borders
@@ -205,13 +160,8 @@ endif
 " It will also install all the plugins in this case
 if !has('nvim')
 	if empty(glob(g:vimplug_dir))
-		if "source ~/.config/vim/vimrc" == $VIMINIT
-			silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
-						\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-		else
-			silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-						\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-		endif
+		silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 		autocmd VimEnter * PlugInstall --sync
 	endif
 else
@@ -235,32 +185,31 @@ endif
 " Airline UI for top and bottom bars
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+
 " Execute Projects and Terminal commands asynchronously
-"Plug 'skywind3000/asyncrun.vim'
+Plug 'skywind3000/asyncrun.vim'
+
 " Searches for custom .vimrc files for specific projects
-"Plug 'krisajenkins/vim-projectlocal'
+Plug 'krisajenkins/vim-projectlocal'
+
 " Code Completion
-"Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Zig syntax highlighting and file detection
+Plug 'ziglang/zig.vim'
 " Markdown Preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 
 			\'for': ['markdown', 'vim-plug']}
-" Latex Compiling and Preview
-Plug 'lervag/vimtex'
-" Vimwiki for writing down notes
-"Plug 'vimwiki/vimwiki'
 " Autogenerate Markdown Table of Contents
 Plug 'mzlogin/vim-markdown-toc'
+
+" Latex Compiling and Preview
+Plug 'lervag/vimtex'
+
 " Sophisticated Multi-Line Editing
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
 " File Templates
-Plug 'tibabit/vim-templates'
-
-" Fixed .vue indentation
-"Plug 'leafOfTree/vim-vue-plugin'
-" Fixed .svelte indentation
-"Plug 'leafOfTree/vim-svelte-plugin'
-
+"Plug 'tibabit/vim-templates'
 " Live Preview of HTML/CSS/JS
 " 	outdated parser, but plugin in development
 "Plug 'turbio/bracey.vim'
@@ -278,7 +227,6 @@ let g:projectlocal_project_markers = ['.vimrc']
 " automatically open a new Vim Window of size 7
 let g:asyncrun_open = 7
 
-
 " Sets Airline Theming
 let g:airline_theme='distinguished'
 let g:airline#extensions#tabline#enabled=1
@@ -295,14 +243,12 @@ command DarkTheme AirlineTheme distinguished
 
 " Vimwiki configs
 " change symbols used for checkboxes
-let g:vimwiki_listsyms = ' ~✓' "✗○●
-" Makes code completion suggestions work with vimwiki files
-augroup ft_vimwiki
-	au!
-	au BufRead,BufNewFile *.wiki set filetype=vimwiki
-	au FileType vimwiki inoremap <silent> <buffer> <expr> <CR> complete_info()['selected'] > -1 ? "\<CR>" : "<Esc>:VimwikiReturn 1 5<CR>"
-	au FileType vimwiki inoremap <silent> <buffer> <expr> <S-CR> complete_info()['selected'] > -1 ? "\<S-CR>" : "<Esc>:VimwikiReturn 2 2<CR>"
-augroup END
+"let g:vimwiki_listsyms = ' ~✓' "✗○●
+"" Makes code completion suggestions work with vimwiki files
+"augroup ft_vimwiki
+"	au!
+"	au BufRead,BufNewFile *.wiki set filetype=vimwiki
+"augroup END
 
 " Coc configs
 " Fix autocompletion adding a newline while in visual multi mode
