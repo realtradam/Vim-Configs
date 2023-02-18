@@ -21,6 +21,11 @@ endif
 " Space is used as the 'modifier'/'leader' key
 let mapleader = " "
 
+" Pseudo transparency
+"if has('nvim')
+"	:set pumblend=1
+"endif
+
 " Create new file if it doesnt exist
 nnoremap cgf :e <cfile><CR>
 " Go to path if it exists
@@ -54,7 +59,6 @@ nnoremap ; :
 vnoremap ; :
 
 " `o` and `O` now only adds new line without going into insert mode
-" 	TODO: broken in vimwiki
 nnoremap o o<esc>
 nnoremap O O<esc>
 
@@ -126,13 +130,13 @@ set foldmethod=syntax
 "	alternative: :set foldmethod=indent
 
 " Remember folds when switching buffers
-augroup remember_folds
-	autocmd!
-	"autocmd BufLeave,BufWinLeave ?* mkview | filetype detect
-	"autocmd BufReadPost ?* silent! loadview | filetype detect
-	autocmd BufWinLeave ?* mkview
-	autocmd BufWinEnter ?* silent! loadview
-augroup END
+"augroup remember_folds
+"	autocmd!
+"	"autocmd BufLeave,BufWinLeave ?* mkview | filetype detect
+"	"autocmd BufReadPost ?* silent! loadview | filetype detect
+"	autocmd BufWinLeave ?* mkview
+"	autocmd BufWinEnter ?* silent! loadview
+"augroup END
 
 
 " Prefer to split below
@@ -176,6 +180,12 @@ endif
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
+" Fuzzy finder
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+"Plug 'nvim-lua/plenary.nvim'
+"Plug 'gfanto/fzf-lsp.nvim'
+
 " Execute Projects and Terminal commands asynchronously
 Plug 'skywind3000/asyncrun.vim'
 
@@ -184,8 +194,18 @@ Plug 'krisajenkins/vim-projectlocal'
 
 " Code Completion
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+" Code highlighting for OpenGL(.glsl)
+Plug 'tikhomirov/vim-glsl'
+
+" Csharp IDE like abilities(Used for unity)
+Plug 'OmniSharp/omnisharp-vim'
+" used for unity IDE capabilites
+Plug 'mhinz/neovim-remote'
+
 " Zig syntax highlighting and file detection
 Plug 'ziglang/zig.vim'
+
 " Markdown Preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 
 			\'for': ['markdown', 'vim-plug']}
@@ -195,14 +215,31 @@ Plug 'mzlogin/vim-markdown-toc'
 " Latex Compiling and Preview
 Plug 'lervag/vimtex'
 
+" PlantUML Syntax
+Plug 'aklt/plantuml-syntax'
+" PlantUML Preview
+Plug 'tyru/open-browser.vim' " dependency
+Plug 'weirongxu/plantuml-previewer.vim'
+
+" Haxe code highlighting and more
+"Plug 'jdonaldson/vaxe'
+
 " Sophisticated Multi-Line Editing
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
+" Colourizes background to match hex color text
+Plug 'norcalli/nvim-colorizer.lua'
+
+" HTML Editing
+"Plug 'tpope/vim-surround' " Surround existing tags with a new tag
+Plug 'AndrewRadev/tagalong.vim' " Change tag on the fly
+Plug 'mattn/emmet-vim' " Create tags fast
+Plug 'turbio/bracey.vim' " Live Preview of HTML/CSS/JS 'outdated for over a year now'
+
 " File Templates
 "Plug 'tibabit/vim-templates'
-" Live Preview of HTML/CSS/JS
-" 	outdated parser, but plugin in development
-"Plug 'turbio/bracey.vim'
+
+
 call plug#end()
 " End of adding Vim plugins
 
@@ -210,26 +247,32 @@ call plug#end()
 " The following is plugin configuration as well as
 " vanilla vim settings tailored for the plugins installed
 
+" Enable colourizer
+"set termguicolors
+"lua require'colorizer'.setup()
+
 " Search for first custom .vimrc Vim can find to load
 " It does this by recursively looking up directories until it finds one
 let g:projectlocal_project_markers = ['.vimrc']
 " When executing a project or terminal command
-" automatically open a new Vim Window of size 7
-let g:asyncrun_open = 7
+" automatically open a new Vim Window of size 5
+let g:asyncrun_open = 5
 
 " Sets Airline Theming
-let g:airline_theme='distinguished'
+"let g:airline_theme='sol'
+"let g:airline_theme='deus'
+"let g:airline_theme='behelit'
+let g:airline_theme='papercolor'
 let g:airline#extensions#tabline#enabled=1
 " Commands to change dark and light themes
 command LightTheme AirlineTheme silver
 command DarkTheme AirlineTheme distinguished
 
-" Theme Changes
-" Disabled for now
-" hi Pmenu ctermbg=black ctermfg=white
-" hi PmenuSel guibg=yellow guifg=black
-" hi Pmenu ctermbg=gray guibg=purple
-" hi Folded guibg=#422552 guifg=#00dddd
+" Disable Vaxe Airline Support
+let g:vaxe_enable_airline_defaults = 0
+
+" Disable funky syntax highlighting
+let g:OmniSharp_highlighting = 0
 
 " Vimwiki configs
 " change symbols used for checkboxes
@@ -247,6 +290,13 @@ augroup coc_autocomplete_newline
 	autocmd User visual_multi_mappings  imap <buffer><expr> <CR> pumvisible() ? "\<C-Y>" : "\<Plug>(VM-I-Return)"
 augroup END
 
+" Navigate completion list with Tab and S-Tab
+"inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+"inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+" Confirm completion if item selected
+"inoremap <silent><expr> <cr> complete_info(['selected'])['selected'] != -1 ? "\<C-y>" : "\<C-g>u\<CR>"
+
 " what program should vimtex use to show live edits
 " let g:vimtex_view_method = 'zathura'
 let g:vimtex_view_general_viewer = 'atril'
@@ -263,5 +313,10 @@ endfunction
 command WordCount call WC()
 
 " Make vimwiki use Markdown
-let g:vimwiki_list = [{'path': '~/vimwiki/',
-			\ 'syntax': 'markdown', 'ext': '.md'}]
+"let g:vimwiki_list = [{'path': '~/vimwiki/',
+"			\ 'syntax': 'markdown', 'ext': '.md'}]
+
+" Emmet enable in insert mode
+let g:user_emmet_mode='a'
+
+
