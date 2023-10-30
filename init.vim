@@ -207,8 +207,9 @@ Plug 'mhinz/neovim-remote'
 Plug 'ziglang/zig.vim'
 
 " Markdown Preview
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 
-			\'for': ['markdown', 'vim-plug']}
+"Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 
+"			\'for': ['markdown', 'vim-plug']}
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
 " Autogenerate Markdown Table of Contents
 Plug 'mzlogin/vim-markdown-toc'
 
