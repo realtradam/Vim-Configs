@@ -89,6 +89,27 @@ augroup enable_spellcheck_when_relevant
 				\*.txt,*.wiki call EnableSpellCheck()
 augroup END
 
+function! GitPushOnSave()
+	"set statusline=GPOS
+	"
+	silent! execute('! [ "$(git rev-parse --abbrev-ref HEAD)" = "wip" ]')
+	if !v:shell_error
+		silent! execute('!git add -A && git commit -m. && git push')
+		set statusline=PassedWIPCheck
+		if !v:shell_error
+			set statusline=Pushed 
+		else
+			set statusline=FailedToPush 
+		endif
+	endif
+
+endfunction
+
+augroup git_push_on_save
+	autocmd!
+	silent autocmd BufWritePost * call GitPushOnSave()
+augroup END
+
 " Toggle Autoindenting Code on filesave
 nnoremap g= :let b:PlugView=winsaveview()<CR>gg=G:call winrestview(b:PlugView) <CR>
 
@@ -207,9 +228,7 @@ Plug 'mhinz/neovim-remote'
 Plug 'ziglang/zig.vim'
 
 " Markdown Preview
-"Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 
-"			\'for': ['markdown', 'vim-plug']}
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
 " Autogenerate Markdown Table of Contents
 Plug 'mzlogin/vim-markdown-toc'
 
